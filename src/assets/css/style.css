@@ -1,0 +1,86 @@
+.bg-danger-300 { background-color: hsl(354deg 90% 74%); }
+.bg-danger-400 { background-color: hsl(354deg 80% 64%); }
+
+.full-height { min-height: 100vh; }
+
+.text-brand { font-weight: 800; }
+
+#landingHero .card { margin: 8rem 0 3rem 0; }
+@media (orientation: landscape) {
+	#landingHero .card { margin: 9rem 0 5rem 0; }
+}
+
+#landingHero .wave {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-image: linear-gradient(var(--bs-danger) 50%, var(--bs-light) 50%);
+	z-index: -1;
+}
+
+#landingHero .wave .title {
+	color: #8c061e;
+    font-size: 2.7rem;
+    font-weight: 900;
+}
+
+#landingHero .card {
+	max-width: 660px;
+    border-radius: 1.2rem;
+}
+
+#landingHero .card-title { font-size: 2.5rem; }
+
+#landingHero .card-title small {
+	font-size: 1rem;
+	font-weight: 900;
+	color: #952833;
+}
+
+#landingHero .card-text { font-size: 1.3rem; }
+
+@media (max-width: 767px) {
+	#landingHero .btn-hero {
+		padding: .5rem 1rem;
+	    font-size: 1.25rem;
+	    border-radius: .3rem;
+	    display: block;
+	}
+}
+
+.pt-extra { padding-top: 5rem; }
+.pb-extra { padding-bottom: 5rem; }
+
+section#question {
+	max-height: 100%;
+	overflow-y: hidden;
+	transition: max-height .3s;
+}
+
+section#question.hide { max-height: 0; }
+
+#team .responsive-row {
+	display: flex;
+	width: auto;
+	margin: 0 auto;
+	overflow-x: auto;
+}
+
+#team .card-body {
+	line-height: 1.3;
+	padding: 2rem 2.5rem;
+}
+
+#team .profile-picture {
+	width: 8rem;
+	border-radius: 50%;
+}
+
+#team .social > a {
+	font-size: 1.7rem;
+	line-height: 1;
+	text-decoration: none;
+	transition: color .3s;
+}
+
+#team .social > a:hover, #team .social > a:active { color: var(--bs-dark); }
