@@ -1,0 +1,30 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+<script src="assets/js/firebase-init.js"></script>
+<script src="assets/js/data.js"></script>
+<script type="text/javascript">
+	
+var database = firebase.database();
+
+const setQuestionData = question => {
+  firebase.database().ref("questions").set(question);
+}
+
+const pushQuestionData = question => {
+	const newQuestionsRef = firebase.database().ref("questions").push();
+	newQuestionsRef.set(question);
+}
+
+questions.forEach(question => {
+	pushQuestionData(question);
+});
+
+</script>
+</body>
+</html>
