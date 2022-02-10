@@ -1,7 +1,7 @@
 const firebaseConfig = {
 	apiKey: "AIzaSyBKIH6Xfr3Ix-JpMG0hgRqQteI44vVQq8s",
 	authDomain: "identifymeapps.firebaseapp.com",
-	databaseURL: "https://identifymeapps-default-rtdb.firebaseio.com/",
+	databaseURL: "https://identifymeapps-default-rtdb.asia-southeast1.firebasedatabase.app",
 	projectId: "identifymeapps",
 	storageBucket: "identifymeapps.appspot.com",
 	messagingSenderId: "927022434226",

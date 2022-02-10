@@ -6,3 +6,4 @@ firestore.rules
 database.rules.json
 firebase.json
 firebase-debug.log
+firebase-helper.txt

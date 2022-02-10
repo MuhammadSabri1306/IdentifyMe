@@ -201,7 +201,6 @@ const appendQuestion = (containerId, data, accordionParent, ...target) => {
 	let j = (parents.length == 1) ? 0 : -1;
 	for(let i=0;  i<questions.length; i++){
 		if(parents.length > 1 && i % parents.length == questions.length % parents.length) j++;
-		console.log(j);
 
 		const [id, title] = questions[i];
 		const component = createQuestionFromTemplate({
@@ -225,4 +224,39 @@ const appendQuestion = (containerId, data, accordionParent, ...target) => {
 	parents.forEach((parent, index) => {
 		target[index].appendChild(parent);
 	});
+};
+
+const loader = {
+	elm: document.getElementById("loaderModal"),
+	show: function(){
+		this.elm.classList.add("is-show");
+		return this;
+	},
+	hide: function(){
+		this.elm.classList.remove("is-show");
+		return this;
+	},
+	toggle: function(){
+		this.elm.classList.toggle("is-show");
+		return this;
+	},
+	isLoading: function(isLoading = true){
+		if(isLoading) this.elm.classList.add("is-loading");
+		else this.elm.classList.remove("is-loading");
+		return this;
+	},
+	isError: function(isError = true, messege = null){
+		if(isError) this.elm.classList.add("is-error");
+		else this.elm.classList.remove("is-error");
+
+		if(messege !== null)
+			this.elm.querySelector(".error-component").innerText = messege;
+		return this;
+	},
+	reset: function(){
+		this.isError(false, "");
+		this.isLoading(false);
+		this.hide();
+		return this;
+	}
 };

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>IdentifyMe Apps | Landing Page</title>
 	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/fontawesome/css/all.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/aos/aos.min.css">
@@ -92,7 +92,7 @@
 				</div></div>
 			</div>
 			<div class="d-flex justify-content-center">
-				<button type="button" class="btn btn-lg btn-dark" data-aos="fade-up">Saya ingin berkontribusi <i class="fas fa-star"></i></button>
+				<button type="button" class="btn btn-lg btn-dark" data-aos="fade-up" data-bs-toggle="modal" data-bs-target="#contributionModal1">Saya ingin berkontribusi <i class="fas fa-star"></i></button>
 			</div>
 		</div>
 	</section>
@@ -147,6 +147,105 @@
 		<span class="text-muted mx-auto">Copyright <i class="far fa-copyright"></i> <b>IdentifyMe</b> 2022</span>
 	</div>
 </footer>
+<div class="modal-components">
+	<div class="modal fade" id="contributionModal1" tabindex="-1" aria-labelledby="contributionModal1Label" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="contributionModal1Label">Mulai Berkontribusi</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<h4>Kami menjamin keamanan data anda.</h4>
+					<ol>
+						<li>Data yang kami butuhkan berupa <b>data pribadi</b> anda, seperti; nama, gender, tempat dan tanggal lahir, dll, serta jawaban-jawaban terkait yang akan digunakan untuk mengidentifikasi karakter kepribadian anda.</li>
+						<li>Data anda akan tersimpan di database kami untuk digunakan sebagai <i>training set</i> dalam rangka membangun kecerdasan sistem dalam menyelesaikan persoalan sesuai orientasi awal.</li>
+						<li>Kami bertanggung jawab terhadap keamanan data anda, menjaga data anda dari kebocoran serta segala bentuk penyalahgunaan data pribadi anda.</li>
+						<li>Website ini menggunakan layanan <i>Cookie</i> demi meningkatkan pelayanan terhadap pengguna. Penggunaan <i>Cookie</i> ini digunakan secara proporsional dengan mempertimbangkan keamanan data pengguna.</li>
+						<li>Dengan melanjutkan, anda telah memahami dan menyetujui kebijakan privasi yang telah ditetapkan.</li>
+					</ol>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+					<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#contributionModal2">Mulai!</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="contributionModal2" tabindex="-1" aria-labelledby="contributionModal2Label" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="contributionModal2Label">Pilih Kategori Usia</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid"><div class="row justify-content-center">
+						<div class="col-auto d-flex flex-column align-items-stretch">
+							<button type="button" class="btn btn-lg btn-outline-danger rounded-bottom-0" data-bs-toggle="modal" data-bs-target="#contributionModal3">Usia 6-12 tahun</button>
+							<button type="button" class="btn btn-lg btn-outline-danger border-top-0 rounded-0" data-bs-toggle="modal" data-bs-target="#contributionModal3">Usia 13-16 tahun</button>
+							<button type="button" class="btn btn-lg btn-outline-danger border-top-0 border-bottom-0 rounded-0" data-bs-toggle="modal" data-bs-target="#contributionModal3">Usia 17-19 tahun</button>
+							<button type="button" class="btn btn-lg btn-outline-danger rounded-top-0" data-bs-toggle="modal" data-bs-target="#contributionModal3">Usia > 19 tahun</button>
+						</div>
+					</div></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="contributionModal3" tabindex="-1" aria-labelledby="contributionModal3Label" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="contributionModal3Label">Masukkan Informasi Pribadi ANda</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form name="formBio" class="container-fluid">
+						<div class="mb-4">
+							<label class="mb-2">Nama Lengkap</label>
+							<input name="nama" type="text" class="form-control mb-2" placeholder="Nama Lengkap">
+						</div>
+						<div class="mb-4">
+							<label class="mb-2">Tempat/Tanggal Lahir</label>
+							<div class="row g-3">
+								<div class="col">
+									<input name="tmpLahir" type="text" class="form-control mb-2" placeholder="Tempat Lahir">
+								</div>
+								<div class="col-auto"><span class="form-control">/</span></div>
+								<div class="col">
+									<input name="tglLahir" value="01/01/1998" type="date" class="form-control mb-2" placeholder="Tanggal Lahir">
+								</div>
+							</div>
+						</div>
+						<div class="mb-4">
+							<label class="mb-2">Gender/Jenis Kelamin</label>
+							<div class="form-check form-check-inline">
+								<input name="gender" type="radio" value="L" class="form-check-input">
+								<label class="form-check-label">Laki-Laki</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input name="gender" type="radio" value="P" class="form-check-input">
+								<label class="form-check-label">Perempuan</label>
+							</div>
+						</div>
+						<div class="mb-4">
+							<label class="mb-2">Alamat</label>
+							<textarea name="alamat" rows="3" class="form-control mb-2" placeholder="Alamat dan Kabupaten/Kota"></textarea>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+					<button type="button" class="btn btn-danger" onclick="startQuestion()">Berikutnya!</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="loaderModal" class="">
+		<div class="loading-component text-white"><i class="fas fa-circle-notch fa-spin fa-3x"></i></div>
+		<div class="error-component">&nbsp;</div>
+	</div>
+</div>
 <template id="questionTemplate">
 	<div class="accordion-item">
 		<h4 class="accordion-header">
@@ -172,18 +271,39 @@
 		<label class="form-check-label"></label>
 	</div>
 </template>
+<script src="/__/firebase/8.10.1/firebase-app.js"></script>
+<script src="/__/firebase/8.10.1/firebase-database.js"></script>
+<script src="assets/js/firebase-init.js?v=1.0.0"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="vendor/fontawesome/js/all.min.js"></script>
 <script src="vendor/aos/aos.min.js"></script>
-<script src="assets/js/script.js"></script>
-<script src="assets/js/data.js"></script>
+<script src="assets/js/script.js?v=1.0.0"></script>
+<script src="assets/js/data.js?v=1.0.0"></script>
 <script type="text/javascript">
 
 AOS.init();
 
 let data = new DataByForm("kuesioner");
 
-const showQuestion = (questions, answerType) => {
+const readQuestionsFromDb = callback => {
+	/*
+	 * function callback(result){ .... }
+	 *
+	 */
+	const db = firebase.database();
+	return db.ref("questions").once("value").then(snapshot => {
+		callback(snapshot.val());
+	});
+};
+
+const readAnswerTypeFromDb = callback => {
+	const db = firebase.database();
+	return db.ref("answerType").once("value").then(snapshot => {
+		callback(snapshot.val());
+	});
+};
+
+const showQuestions = (questions, answerType) => {
 	const questionContainer = document.getElementById("question");
 	if(window.innerWidth >= 992)
 		appendQuestion("accordionQuestion", {questions, answerType}, "#questionsLoadParent", questionContainer.querySelector("#questionsLoad1"), questionContainer.querySelector("#questionsLoad2"));
@@ -192,7 +312,25 @@ const showQuestion = (questions, answerType) => {
 	questionContainer.classList.remove("hide");
 };
 
-showQuestion(questions, answerType);
+async function startQuestion(){
+	loader.isLoading(true).show();
+	if(typeof IS_OFFLINE == "undefined" || !IS_OFFLINE){
+		await readAnswerTypeFromDb(function(result){
+			answerType = result;
+		});
+		await readQuestionsFromDb(function(result){
+			questions = result;
+		});
+	}
+
+	showQuestions(questions, answerType);
+	bootstrap.Modal.getInstance(document.querySelector("#contributionModal3")).hide();
+	loader.reset();
+	location.href = "#question";
+}
+
+// showQuestion(questions, answerType);
+// loader.isLoading(true).show();
 
 </script>
 </body>
