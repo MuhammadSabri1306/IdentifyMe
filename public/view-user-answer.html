@@ -1,0 +1,83 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>IdentifyMe Apps | Landing Page</title>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/fontawesome/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/aos/aos.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css?v=1.0.4">
+	<script type="text/javascript">
+		if(!sessionStorage.IdentifyMeUser) document.location.href = "login.html";
+	</script>
+</head>
+<body>
+<main class="full-height bg-light pt-extra pb-extra">
+	<div class="containerfluid"><h2 class="mb-5">Data User</h2></div>
+	<div class="container">
+		<div class="table-responsive">
+			<table class="table table-sm table-striped align-middle">
+				<thead>
+					<tr>
+						<th>No.</th><th>Nama</th><th>Gender</th><th>Tempat/Tanggal Lahir</th><th>Alamat</th>
+						<th>Hasil</th>
+					</tr>
+				</thead>
+				<tbody id="tableContent"></tbody>
+			</table>
+		</div>
+	</div>
+</main>
+<footer class="bg-light pt-5 pb-4">
+	<div class="container d-flex">
+		<span class="text-muted mx-auto">Copyright <i class="far fa-copyright"></i> <b>IdentifyMe</b> 2022</span>
+	</div>
+</footer>
+<template id="contentTemplate">
+	<tr>
+		<td data-table="no"></td>
+		<td data-table="nama"></td>
+		<td data-table="gender"></td>
+		<td data-table="ttl"></td>
+		<td data-table="alamat"></td>
+		<td><div class="d-grid g-0">
+			<button type="button" onclick="showResult()" data-user-id=""></button>
+		</div></td>
+	</tr>
+</template>
+<script src="/__/firebase/8.10.1/firebase-app.js"></script>
+<script src="/__/firebase/8.10.1/firebase-database.js"></script>
+<script src="assets/js/firebase-init.js?v=1.0.4"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/fontawesome/js/all.min.js"></script>
+<script src="vendor/aos/aos.min.js"></script>
+<script type="text/javascript">
+
+var database = {
+	db: firebase.database(),
+	push: function(reference, data){
+		const newPush = this.db.ref(reference).push();
+		newPush.set(data);
+	},
+	set: function(reference, data){
+		this.db.ref(reference).set(data);
+	},
+	once: function(reference, callback){
+		return this.db.ref(reference).once("value").then(callback);
+		/*
+		 * function callback(snapshot){ .... }
+		 *
+		 */
+	}
+};
+
+var user = JSON.parse(sessionStorage.IdentifyMeUser);
+database.once("user", function(result){
+	const admin = Object.values(result.val()).filter(u => (u.role === "admin" && u.email === user.email)).length == 1;
+	if(!admin) document.location.href = "login.html";
+});
+
+</script>
+</body>
+</html>

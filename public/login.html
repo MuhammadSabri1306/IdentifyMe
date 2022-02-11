@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>IdentifyMe Apps | Landing Page</title>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/fontawesome/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/aos/aos.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css?v=1.0.4">
+</head>
+<body class="bg-danger bg-gradient">
+<main class="container full-height d-flex flex-column justify-content-center align-items-stretch py-5">
+	<h1 class="text-center text-brand text-white mb-3">IdentifyMe<small>Apps</small></h1>
+	<div class="row justify-content-center"><div class="col-md-6 col-lg-4">
+		<h2 class="text-center text-white mt-4 mb-5"><i class="fas fa-unlock-alt fa-2x"></i></h2>
+		<form name="loginForm" class="container-fluid">
+			<input type="text" name="email" class="form-control mb-4" placeholder="Email">
+			<input type="password" name="password" class="form-control mb-4" placeholder="Password">
+			<div class="d-grid g-0 mb-5">
+				<button type="button" id="btnSubmit" class="btn btn-outline-light">Login</button>
+			</div>
+			<div class="d-grid g-0">
+				<button type="button" class="btn btn-primary" id="btnGoogle"><i class="fab fa-google"></i> Login with Google</button>
+			</div>
+		</form>
+	</div></div>
+	<div id="alertSuccess" class="alert alert-success alert-dismissible fade show mt-3 d-none" role="alert">
+		Your <strong>session</strong> already created!
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+</main>
+<script src="/__/firebase/8.10.1/firebase-app.js"></script>
+<script src="/__/firebase/8.10.1/firebase-auth.js"></script>
+<script src="assets/js/firebase-init.js?v=1.0.4"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/fontawesome/js/all.min.js"></script>
+<script src="vendor/aos/aos.min.js"></script>
+<script src="assets/js/data.js?v=1.0.4"></script>
+<script type="text/javascript">
+	
+const createSession = (user) => sessionStorage.setItem("IdentifyMeUser", JSON.stringify(user));
+
+const showAlertSuccess = () => {
+	const alert = document.getElementById("alertSuccess");
+	alert.classList.remove("d-none");
+	setTimeout(() => {
+		alert.classList.add("show");
+	}, 1000);
+};
+
+document.getElementById("btnSubmit").addEventListener("click", function(event){
+	/*const email = document.forms["loginForm"]["email"].value,
+		password = document.forms["loginForm"]["password"].value;
+	createSession({email, pass});
+	showAlertSuccess();*/
+
+	const email = document.forms["loginForm"]["email"].value,
+		password = document.forms["loginForm"]["password"].value;
+
+	firebase.auth().signInWithEmailAndPassword(email, password)
+		.then((userCredential) => {
+
+			const user = userCredential.user;
+			createSession(user);
+
+		}).catch((error) => {
+			console.error(`Error Code: ${error.code}\n${error.message}`);
+		});
+});
+
+document.getElementById("btnGoogle").addEventListener("click", function(event){
+	const provider = new firebase.auth.GoogleAuthProvider();
+
+	firebase.auth().signInWithPopup(provider)
+		.then(result => {
+
+			const user = result.user;
+			createSession(user);
+			showAlertSuccess();
+
+		}).catch(error => {
+			console.error(`Error Code: ${error.code}\n${error.message}`);
+		});
+});
+
+</script>
+</body>
+</html>

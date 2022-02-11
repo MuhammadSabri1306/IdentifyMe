@@ -1,12 +1,13 @@
-
-const myCookie = (name, value = null, days = 0, path = "/") => {
+/*const myCookie = (name, value = null, days = 0, path = "/") => {
 	if(value === null){
 		if(document.cookie.length < 1) return;
 
-		return document.cookie.split(": ").reduce((r, v) => {
+		const dataCookie = document.cookie.split(": ").reduce((r, v) => {
 			const parts = v.split("=");
-			return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-		});
+			return parts[0] === name ? parts[1] : r;
+		}).replace(name + "=", "");
+
+		return decodeURIComponent(dataCookie);
 	}
 
 	let expires = "";
@@ -17,23 +18,7 @@ const myCookie = (name, value = null, days = 0, path = "/") => {
 
 	document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=" + path;
 	console.log("Success to set Cookie: " + myCookie(name))
-}
-
-/*const Cookie = {
-	get: name => {
-		let c = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`)[1];
-		if(c) return decodeURIComponent(c);
-	},
-	set: (name, value, options = {days: 0, path: "/"}) => {
-		if(options.days){
-			options["max-age"] = options.days * 60 * 60 * 24;
-			delete options.days;
-		}
-
-		options = Object.entries(options).reduce((accumulatedStr, [q, v]) => `${accumulatedStr}; ${q}=${v}`, "");
-		document.cookie = name + "=" + encodeURIComponent(value) + options;
-	}
-};*/
+}*/
 
 class DataForm {
 	static join(...dataForm){
@@ -56,7 +41,7 @@ class DataForm {
 		this._config = {
 			sourceForm: formName,
 			lastAccess: 0,
-			cookieName: "naivebayes-" + formName
+			cookieName: "identifyMe-" + formName
 		};
 
 		this._data = {};
@@ -121,31 +106,38 @@ class DataForm {
 		document.forms[this._config.sourceForm].reset();
 	}
 
+	readFromSession(){
+		const data = sessionStorage[this._config.cookieName];
+		if(!data) return;
+		return JSON.parse(data);
+	}
+
+	writeToSession(){
+		let data = {
+			lastAccess: this._config.lastAccess,
+			data: this._data
+		};
+
+		data = JSON.stringify(data);
+		sessionStorage.setItem(this._config.cookieName, data);
+	}
+
 	sync(){
 		/*
 		 * Up for cookie pass to data
 		 * Not Up for data pass to cookie
 		 */
 		const up = dataLastAccess => {
-			const userCookie = myCookie(this._config.cookieName);
-			if(userCookie === undefined) return false;
-
-			const cookieLastAccess = JSON.parse(userCookie).lastAccess;
-			if(cookieLastAccess < dataLastAccess) return false;
-
+			let userSessionData = this.readFromSession();
+			if(userSessionData === undefined || userSessionData.lastAccess < dataLastAccess) return false;
 			return true;
 		};
 
 		if(up(this._config.lastAccess))
-			this._data = JSON.parse(myCookie(this._config.cookieName)).data;
+			this._data = this.readFromSession().data;
 
 		this.isUpdated();
-		const dataToCookie = {
-			lastAccess: this._config.lastAccess,
-			data: this._data
-		};
-
-		myCookie(this._config.cookieName, JSON.stringify(dataToCookie));
+		this.writeToSession();
 	}
 };
 

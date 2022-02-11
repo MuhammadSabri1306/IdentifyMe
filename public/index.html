@@ -7,7 +7,8 @@
 	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/fontawesome/css/all.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/aos/aos.min.css">
-	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css?v=1.0.4">
+	<script src="vendor/babel-js/babel.min.js"></script>
 </head>
 <body>
 <header id="landingHero" class="position-relative">
@@ -289,12 +290,12 @@
 </template>
 <script src="/__/firebase/8.10.1/firebase-app.js"></script>
 <script src="/__/firebase/8.10.1/firebase-database.js"></script>
-<script src="assets/js/firebase-init.js?v=1.0.0"></script>
+<script src="assets/js/firebase-init.js?v=1.0.4"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="vendor/fontawesome/js/all.min.js"></script>
 <script src="vendor/aos/aos.min.js"></script>
-<script src="assets/js/script.js?v=1.0.0"></script>
-<script src="assets/js/data.js?v=1.0.0"></script>
+<script src="assets/js/script.js?v=1.0.5"></script>
+<script src="assets/js/data.js?v=1.0.4"></script>
 <script type="text/javascript">
 
 AOS.init();
@@ -360,7 +361,7 @@ modalBio.addEventListener("show.bs.modal", function(event){
 });
 
 async function startQuestion(){
-	const IS_OFFLINE = true;
+	const IS_OFFLINE = false;
 
 	const validation = validate("formBio");
 	if(!validation.isValid){
@@ -394,7 +395,7 @@ function changeAnswer(radioElm){
 	dataAnswer.sync();
 }
 
-function saveAnswer(){
+async function saveAnswer(){
 	const validation = validate("formAnswer");
 	if(!validation.isValid){
 		alert("Terdapat pertanyaan yang belum anda isi!");
@@ -403,13 +404,31 @@ function saveAnswer(){
 	}
 
 	const data = DataForm.join(dataBio, dataAnswer);
-	console.log(data);
-}
+	dataBio.sync();
+	dataAnswer.sync();
+	let id = null;
 
-/*
- * tinggal push dari data ke form
- * ! Jangan gabung dengan sync()
- */
+	await firebase.database().ref('answers').orderByChild('nama').once("value").then(snapshot => {
+		const result = snapshot.val();
+		const index = Object.entries(result).findIndex(([key, val]) => {
+			if(!val.hasOwnProperty("nama") && !val.hasOwnProperty("tglLahir") && !val.hasOwnProperty("gender"))
+				return false;
+			return (val.nama === data.nama) && (val.tglLahir === data.tglLahir) && (val.gender === data.gender);
+		});
+
+		if(index >= 0) id = Object.keys(result)[index];
+	});
+
+	if(id === null){
+		const newPush = firebase.database().ref("answers").push();
+		newPush.set(data);
+		alert("Your data was saved!");
+		return;
+	}
+
+	firebase.database().ref("answers/" + id).set(data);
+	alert("Your data was saved!");
+}
 
 </script>
 </body>

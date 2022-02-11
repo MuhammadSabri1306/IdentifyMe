@@ -4,25 +4,16 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+	<script type="text/javascript">
+		if(!sessionStorage.IdentifyMeUser) document.location.href = "login.html";
+	</script>
 </head>
 <body>
 <script src="/__/firebase/8.10.1/firebase-app.js"></script>
 <script src="/__/firebase/8.10.1/firebase-database.js"></script>
-<script src="assets/js/data.js"></script>
+<script src="assets/js/firebase-init.js?v=1.0.4"></script>
+<script src="assets/js/data.js?v=1.0.4"></script>
 <script type="text/javascript">
-
-
-const firebaseConfig = {
-	apiKey: "AIzaSyBKIH6Xfr3Ix-JpMG0hgRqQteI44vVQq8s",
-	authDomain: "identifymeapps.firebaseapp.com",
-	databaseURL: "https://identifymeapps-default-rtdb.asia-southeast1.firebasedatabase.app",
-	projectId: "identifymeapps",
-	storageBucket: "identifymeapps.appspot.com",
-	messagingSenderId: "927022434226",
-	appId: "1:927022434226:web:36a3561cad7d4bdd2286ab"
-};
-
-const app = firebase.initializeApp(firebaseConfig);
 
 var database = {
 	db: firebase.database(),
@@ -41,6 +32,12 @@ var database = {
 		 */
 	}
 };
+
+var user = JSON.parse(sessionStorage.IdentifyMeUser);
+database.once("user", function(result){
+	const admin = Object.values(result.val()).filter(u => (u.role === "admin" && u.email === user.email)).length == 1;
+	if(!admin) document.location.href = "login.html";
+});
 
 </script>
 </body>
