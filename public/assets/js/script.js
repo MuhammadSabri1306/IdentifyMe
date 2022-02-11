@@ -15,9 +15,8 @@ const myCookie = (name, value = null, days = 0, path = "/") => {
 		expires = "; expires=" + date;
 	}
 
-	console.log(name + "=" + encodeURIComponent(value) + expires + "; path=" + path);
-
 	document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=" + path;
+	console.log("Success to set Cookie: " + myCookie(name))
 }
 
 /*const Cookie = {
@@ -36,16 +35,32 @@ const myCookie = (name, value = null, days = 0, path = "/") => {
 	}
 };*/
 
-class DataByForm {
+class DataForm {
+	static join(...dataForm){
+		const notValid = dataForm.findIndex(df => typeof df.isDataForm == "undefined") >= 0;
+		if(notValid){
+			console.error("The Parameters must be instance by DataForm");
+			return;
+		}
+
+		let result = {};
+		dataForm.forEach(df => {
+			const data = df.get();
+			Object.entries(data).forEach(([key, val]) => result[key] = val);
+		});
+
+		return result;
+	}
+
 	constructor(formName){
 		this._config = {
 			sourceForm: formName,
 			lastAccess: 0,
-			cookieName: "naivebayes"
+			cookieName: "naivebayes-" + formName
 		};
 
 		this._data = {};
-		this.isUpdated();
+		this.isDataForm = true;
 	}
 
 	isUpdated(){
@@ -53,9 +68,21 @@ class DataByForm {
 		this._config.lastAccess = lastAccess.valueOf();
 	}
 
+	isEmpty(){
+		return Object.values(this._data).length < 1;
+	}
+
 	changeForm(formName){
 		this._config.sourceForm = formName;
 		this.isUpdated();
+	}
+
+	exists(key){
+		return this._data.hasOwnProperty(key);
+	}
+
+	get(key = null){
+		return (key === null) ? this._data : this._data[key];
 	}
 
 	push(fieldName){
@@ -66,12 +93,32 @@ class DataByForm {
 		this.isUpdated();
 	}
 
-	pull(key = null){
-		return (key === null) ? this._data : this._data[key];
+	pushAll(){
+		const form = document.forms[this._config.sourceForm];
+		if(!form) return;
+
+		const formData = new FormData(form);
+		formData.forEach((value, key) => {
+			if(value.length > 0) this._data[key] = value;
+		});
+
+		this.isUpdated();
 	}
 
-	exists(key){
-		return this._data.hasOwnProperty(key);
+	reset(){
+		this._data = {};
+		this.isUpdated();
+	}
+
+	fillForm(){
+		Object.entries(this.get()).forEach(([key, val]) => {
+			const elm = document.forms[this._config.sourceForm][key];
+			if(elm) elm.value = val;
+		});
+	}
+
+	resetForm(){
+		document.forms[this._config.sourceForm].reset();
 	}
 
 	sync(){
@@ -89,8 +136,6 @@ class DataByForm {
 			return true;
 		};
 
-		console.log(up(this._config.lastAccess));
-
 		if(up(this._config.lastAccess))
 			this._data = JSON.parse(myCookie(this._config.cookieName)).data;
 
@@ -102,20 +147,17 @@ class DataByForm {
 
 		myCookie(this._config.cookieName, JSON.stringify(dataToCookie));
 	}
-
-	getDataForm(){
-		
-	}
 };
 
-const createAnswerFromTemplate = (name, id, title, isChecked = false) => {
+const createAnswerFromTemplate = (name, id, title, isRequired = false) => {
 	const component = document.getElementById("answerTemplate").content.cloneNode(true);
 	id = name + "-" + id;
 
 	const radio = component.querySelector(".form-check-input");
 	radio.setAttribute("name", name);
 	radio.setAttribute("id", id);
-	if(isChecked) radio.setAttribute("checked", true);
+	radio.setAttribute("value", title);
+	if(isRequired) radio.setAttribute("required", true);
 
 	const label = component.querySelector(".form-check-label");
 	label.setAttribute("for", id);
@@ -125,7 +167,7 @@ const createAnswerFromTemplate = (name, id, title, isChecked = false) => {
 };
 
 const createQuestionFromTemplate = (config = {}) => {
-	const importantAttr = ["questionId", "questionTitle", "parent", "headingId", "collapseId", "prevId", "nextId", "answerType", "isShow"];
+	const importantAttr = ["questionId", "choices", "parent", "headingId", "collapseId", "prevId", "nextId", "answerType", "isShow"];
 	const valid = typeof config == "object" && importantAttr.every(prop => config.hasOwnProperty(prop));
 	if(!valid) return false;
 
@@ -141,10 +183,15 @@ const createQuestionFromTemplate = (config = {}) => {
 	content.setAttribute("aria-labelledBy", config.headingId);
 	content.setAttribute("data-bs-parent", config.parent);
 
-	content.querySelector(".questions-question").innerText = config.questionTitle;
+	Object.entries(config.choices).forEach(([choiceId, choice]) => {
+		content.querySelector(`.card[data-choice="${choiceId}"] h4`).innerText = choiceId.toUpperCase();
+		content.querySelector(`.card[data-choice="${choiceId}"] p`).innerText = choice;
+	});
 	const answerContainer = content.querySelector(".questions-answer");
 	config.answerType.forEach((item, i) => {
-		const answerComponent = createAnswerFromTemplate(config.questionId, item.id, item.title, false);
+		const isRequired = i === 0;
+		const answerComponent = createAnswerFromTemplate(config.questionId, item.id, item.title, isRequired);
+
 		answerContainer.appendChild(answerComponent);
 	});
 
@@ -186,27 +233,22 @@ const createQuestionFromTemplate = (config = {}) => {
 	return component;
 };
 
-const appendQuestion = (containerId, data, accordionParent, ...target) => {
+const appendQuestion = (containerId, data, target) => {
 	if(!data.hasOwnProperty("questions") || !data.hasOwnProperty("answerType")) return false;
 	const questions = Object.entries(data.questions),
 		answerType = data.answerType;
 
-	const parents = target.map((item, index) => {
-		const parent = document.createElement("div");
-		parent.classList.add("accordion");
-		parent.setAttribute("id", containerId + index);
-		return parent;
-	});
+	const parent = document.createElement("div");
+	parent.classList.add("accordion");
+	parent.setAttribute("id", containerId);
 
-	let j = (parents.length == 1) ? 0 : -1;
 	for(let i=0;  i<questions.length; i++){
-		if(parents.length > 1 && i % parents.length == questions.length % parents.length) j++;
-
-		const [id, title] = questions[i];
+		// const [id, title] = questions[i];
+		const [id, choices] = questions[i];
 		const component = createQuestionFromTemplate({
 			questionId: id,
-			questionTitle: title,
-			parent: accordionParent,
+			choices: choices,
+			parent: "#" + containerId,
 			headingId: "questionHeading-" + id,
 			headingTitle: `Pertanyaan ${i + 1}`,
 			collapseId: "questionCollapse-" + id,
@@ -218,12 +260,10 @@ const appendQuestion = (containerId, data, accordionParent, ...target) => {
 			isShow: (i === 0)
 		});
 
-		if(component) parents[j].appendChild(component);
+		if(component) parent.appendChild(component);
 	}
 
-	parents.forEach((parent, index) => {
-		target[index].appendChild(parent);
-	});
+	target.appendChild(parent);
 };
 
 const loader = {

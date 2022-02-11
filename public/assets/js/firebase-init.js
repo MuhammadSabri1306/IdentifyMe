@@ -8,4 +8,4 @@ const firebaseConfig = {
 	appId: "1:927022434226:web:36a3561cad7d4bdd2286ab"
 };
 
-const app = firebase.initializeApp(firebaseConfig);
+const app = (typeof firebase == "undefined") ? null : firebase.initializeApp(firebaseConfig);

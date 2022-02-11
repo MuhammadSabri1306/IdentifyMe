@@ -97,14 +97,11 @@
 		</div>
 	</section>
 	<section id="question" class="hide">
-		<form name="kuesioner" class="container pt-extra pb-extra">
-			<div id="questionsLoadParent" class="row">
-				<div id="questionsLoad1" class="col-lg mb-5"></div>
-				<div id="questionsLoad2" class="col-lg d-none d-lg-block mb-5"></div>
-			</div>
+		<form name="formAnswer" class="container pt-extra pb-extra">
+			<div id="questionsLoader"></div>
 			<div class="d-flex justify-content-end px-4">
-				<button type="button" class="btn btn-secondary me-4">Batal</button>
-				<button type="button" class="btn btn-danger">Simpan <i class="fas fa-check"></i></button>
+				<button type="button" class="btn btn-secondary me-4" onclick="questionsSectionView(false)">Batal</button>
+				<button type="button" class="btn btn-danger" onclick="saveAnswer()">Simpan <i class="fas fa-check"></i></button>
 			</div>
 		</form>
 	</section>
@@ -203,34 +200,36 @@
 					<form name="formBio" class="container-fluid">
 						<div class="mb-4">
 							<label class="mb-2">Nama Lengkap</label>
-							<input name="nama" type="text" class="form-control mb-2" placeholder="Nama Lengkap">
+							<input name="nama" type="text" class="form-control mb-2" placeholder="Nama Lengkap" required>
 						</div>
 						<div class="mb-4">
 							<label class="mb-2">Tempat/Tanggal Lahir</label>
 							<div class="row g-3">
 								<div class="col">
-									<input name="tmpLahir" type="text" class="form-control mb-2" placeholder="Tempat Lahir">
+									<input name="tmpLahir" type="text" class="form-control mb-2" placeholder="Tempat Lahir" required>
 								</div>
-								<div class="col-auto"><span class="form-control">/</span></div>
+								<div class="col-auto"><span class="form-control border-white px-0">/</span></div>
 								<div class="col">
-									<input name="tglLahir" value="01/01/1998" type="date" class="form-control mb-2" placeholder="Tanggal Lahir">
+									<input name="tglLahir" value="1998-01-01" type="date" class="form-control mb-2" placeholder="Tanggal Lahir" required>
 								</div>
 							</div>
 						</div>
 						<div class="mb-4">
 							<label class="mb-2">Gender/Jenis Kelamin</label>
-							<div class="form-check form-check-inline">
-								<input name="gender" type="radio" value="L" class="form-check-input">
-								<label class="form-check-label">Laki-Laki</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input name="gender" type="radio" value="P" class="form-check-input">
-								<label class="form-check-label">Perempuan</label>
+							<div class="ms-4">
+								<div class="form-check form-check-inline">
+									<input name="gender" type="radio" value="L" class="form-check-input" checked>
+									<label class="form-check-label">Laki-Laki</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input name="gender" type="radio" value="P" class="form-check-input">
+									<label class="form-check-label">Perempuan</label>
+								</div>
 							</div>
 						</div>
 						<div class="mb-4">
 							<label class="mb-2">Alamat</label>
-							<textarea name="alamat" rows="3" class="form-control mb-2" placeholder="Alamat dan Kabupaten/Kota"></textarea>
+							<textarea name="alamat" rows="3" class="form-control mb-2" placeholder="Alamat dan Kabupaten/Kota" required></textarea>
 						</div>
 					</form>
 				</div>
@@ -254,8 +253,25 @@
 		<div class="accordion-collapse">
 			<div class="accordion-body">
 				<div class="mb-4">
-					<label class="questions-question mb-3"></label>
-					<div class="questions-answer"></div>
+					<div class="questions-choices row">
+						<div class="col-md-6 col-lg-3 pb-4"><div class="card" data-choice="a"><div class="card-body"><div class="d-flex">
+							<h4 class="font-weight-800 me-3"></h4>
+							<p class="mb-0"></p>
+						</div></div></div></div>
+						<div class="col-md-6 col-lg-3 pb-4"><div class="card" data-choice="b"><div class="card-body"><div class="d-flex">
+							<h4 class="font-weight-800 me-3"></h4>
+							<p class="mb-0"></p>
+						</div></div></div></div>
+						<div class="col-md-6 col-lg-3 pb-4"><div class="card" data-choice="c"><div class="card-body"><div class="d-flex">
+							<h4 class="font-weight-800 me-3"></h4>
+							<p class="mb-0"></p>
+						</div></div></div></div>
+						<div class="col-md-6 col-lg-3 pb-4"><div class="card" data-choice="d"><div class="card-body"><div class="d-flex">
+							<h4 class="font-weight-800 me-3"></h4>
+							<p class="mb-0"></p>
+						</div></div></div></div>
+					</div>
+					<div class="questions-answer text-center"></div>
 				</div>
 				<div class="d-flex justify-content-end">
 					<button type="button" class="btn btn-sm btn-outline-primary questions-prev me-4"><i class="fas fa-caret-left"></i> Kembali</button>
@@ -267,8 +283,8 @@
 </template>
 <template id="answerTemplate">
 	<div class="form-check form-check-inline py-2">
-		<input type="radio" class="form-check-input">
-		<label class="form-check-label"></label>
+		<input type="radio" class="form-check-input" onclick="changeAnswer(this)">
+		<label class="form-check-label font-weight-800"></label>
 	</div>
 </template>
 <script src="/__/firebase/8.10.1/firebase-app.js"></script>
@@ -283,7 +299,22 @@
 
 AOS.init();
 
-let data = new DataByForm("kuesioner");
+var dataBio = new DataForm("formBio"),
+	dataAnswer = new DataForm("formAnswer");
+dataBio.sync();
+dataAnswer.sync();
+
+const validate = formName => {
+	const inputsElem = document.forms[formName].querySelectorAll("[required]");
+	const notValid = Array.from(inputsElem).map(input => {
+		return document.forms[formName][input.getAttribute("name")].value.length > 0;
+	}).indexOf(false);
+
+	return {
+		elm: (notValid >= 0) ? inputsElem[notValid] : null,
+		isValid: (notValid < 0)
+	};
+};
 
 const readQuestionsFromDb = callback => {
 	/*
@@ -303,17 +334,45 @@ const readAnswerTypeFromDb = callback => {
 	});
 };
 
-const showQuestions = (questions, answerType) => {
+const questionsSectionView = show => {
 	const questionContainer = document.getElementById("question");
-	if(window.innerWidth >= 992)
-		appendQuestion("accordionQuestion", {questions, answerType}, "#questionsLoadParent", questionContainer.querySelector("#questionsLoad1"), questionContainer.querySelector("#questionsLoad2"));
-	else
-		appendQuestion("accordionQuestion", {questions, answerType}, "#questionsLoadParent", questionContainer.querySelector("#questionsLoad1"));
-	questionContainer.classList.remove("hide");
+
+	if(!show) questionContainer.classList.add("hide");
+	else questionContainer.classList.remove("hide");
 };
 
+const showQuestions = (questions, answerType) => {
+	appendQuestion("accordionQuestion", {questions, answerType}, document.getElementById("questionsLoader"));
+
+	dataAnswer.sync();
+	if(!dataAnswer.isEmpty())
+		dataAnswer.fillForm();
+
+	questionsSectionView(true);
+};
+
+const modalBio = document.getElementById("contributionModal3");
+modalBio.addEventListener("show.bs.modal", function(event){
+	dataBio.sync();
+
+	if(!dataBio.isEmpty())
+		dataBio.fillForm();
+});
+
 async function startQuestion(){
+	const IS_OFFLINE = true;
+
+	const validation = validate("formBio");
+	if(!validation.isValid){
+		alert("Terdapat field yang belum anda isi!");
+		validation.elm.focus();
+		return;
+	}
+
+	dataBio.pushAll();
+	dataBio.sync();
 	loader.isLoading(true).show();
+
 	if(typeof IS_OFFLINE == "undefined" || !IS_OFFLINE){
 		await readAnswerTypeFromDb(function(result){
 			answerType = result;
@@ -329,8 +388,28 @@ async function startQuestion(){
 	location.href = "#question";
 }
 
-// showQuestion(questions, answerType);
-// loader.isLoading(true).show();
+function changeAnswer(radioElm){
+	const name = radioElm.getAttribute("name");
+	dataAnswer.push(name);
+	dataAnswer.sync();
+}
+
+function saveAnswer(){
+	const validation = validate("formAnswer");
+	if(!validation.isValid){
+		alert("Terdapat pertanyaan yang belum anda isi!");
+		validation.elm.focus();
+		return;
+	}
+
+	const data = DataForm.join(dataBio, dataAnswer);
+	console.log(data);
+}
+
+/*
+ * tinggal push dari data ke form
+ * ! Jangan gabung dengan sync()
+ */
 
 </script>
 </body>
