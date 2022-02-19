@@ -141,19 +141,24 @@ class DataForm {
 	}
 };
 
-const createAnswerFromTemplate = (name, id, title, isRequired = false) => {
-	const component = document.getElementById("answerTemplate").content.cloneNode(true);
-	id = name + "-" + id;
+const createChoiceFromTemplate = (choiceId, choiceTitle, targetName, isActive) => {
+	const component = document.getElementById("choiceTemplate").content.cloneNode(true);
+	const choiceComponent = component.querySelector(".card");
 
-	const radio = component.querySelector(".form-check-input");
-	radio.setAttribute("name", name);
-	radio.setAttribute("id", id);
-	radio.setAttribute("value", title);
-	if(isRequired) radio.setAttribute("required", true);
+	choiceComponent.querySelector("h4").innerText = choiceId.toUpperCase();
+	choiceComponent.querySelector("p").innerText = choiceTitle;
+	
+	choiceComponent.setAttribute("data-choice", choiceId);
+	choiceComponent.setAttribute("data-targetName", targetName);
 
-	const label = component.querySelector(".form-check-label");
-	label.setAttribute("for", id);
-	label.innerText = title;
+	choiceComponent.addEventListener("mouseenter", function(){
+		if(this.getAttribute("data-active") === "false")
+			this.classList.add("border-danger");
+	});
+	choiceComponent.addEventListener("mouseleave", function(){
+		if(this.classList.contains("border-danger"))
+			this.classList.remove("border-danger");
+	});
 
 	return component;
 };
@@ -164,10 +169,12 @@ const createQuestionFromTemplate = (config = {}) => {
 	if(!valid) return false;
 
 	const component = document.getElementById("questionTemplate").content.cloneNode(true);
-	const heading = component.querySelector(".accordion-header"),
-		content = component.querySelector(".accordion-collapse");
+	const content = component.querySelector(".accordion-collapse"),
+		heading = component.querySelector(".card-header > h4"),
+		body = component.querySelector(".card-body");
 
-	heading.setAttribute("id", "questionHeading-" + config.id);
+	heading.setAttribute("id", config.headingId);
+	heading.innerText = config.headingTitle;
 	
 	content.setAttribute("id", config.collapseId);
 	content.classList.add("collapse");
@@ -175,34 +182,25 @@ const createQuestionFromTemplate = (config = {}) => {
 	content.setAttribute("aria-labelledBy", config.headingId);
 	content.setAttribute("data-bs-parent", config.parent);
 
-	Object.entries(config.choices).forEach(([choiceId, choice]) => {
-		content.querySelector(`.card[data-choice="${choiceId}"] h4`).innerText = choiceId.toUpperCase();
-		content.querySelector(`.card[data-choice="${choiceId}"] p`).innerText = choice;
-	});
-	const answerContainer = content.querySelector(".questions-answer");
-	config.answerType.forEach((item, i) => {
-		const isRequired = i === 0;
-		const answerComponent = createAnswerFromTemplate(config.questionId, item.id, item.title, isRequired);
+	const choicesContainer = body.querySelector(".questions-choices");
+	const inputElm = choicesContainer.querySelector("input[type='hidden']");
+	inputElm.setAttribute("name", config.questionId);
+	Object.entries(config.choices).forEach(([choiceId, choiceTitle]) => {
+		const isActive = inputElm.value == choiceId;
+		const choiceComponent = createChoiceFromTemplate(choiceId, choiceTitle, config.questionId);
 
-		answerContainer.appendChild(answerComponent);
+		choicesContainer.appendChild(choiceComponent);
 	});
 
 	const togglers = [{
 		elm: function(){
-			return component.querySelector(".accordion-button")
-		},
-		title: config.headingTitle,
-		target: config.collapseId,
-		expanded: config.isShow.toString()
-	}, {
-		elm: function(){
-			return content.querySelector(".questions-prev");
+			return body.querySelector(".questions-prev");
 		},
 		target: config.prevId,
 		expanded: "false"
 	}, {
 		elm: function(){
-			return content.querySelector(".questions-next");
+			return body.querySelector(".questions-next");
 		},
 		target: config.nextId,
 		expanded: "false"
